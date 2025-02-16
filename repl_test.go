@@ -12,10 +12,21 @@ func TestCleanInput(t *testing.T) {
 
     }{
         {
-            input: " hello  world ",
+            input:    "  ",
+            expected: []string{},
+        },
+        {
+            input:    "  hello  ",
+            expected: []string{"hello"},
+        },
+        {
+            input:    "  hello  world  ",
             expected: []string{"hello", "world"},
         },
-        // add more cases here...
+        {
+            input:    "  HellO  World  ",
+            expected: []string{"hello", "world"},
+        },
     }
 
     for _, c := range cases {
