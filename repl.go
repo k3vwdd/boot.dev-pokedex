@@ -7,10 +7,20 @@ import (
     "bufio"
 )
 
+type Config struct {
+	Count    int    `json:"count"`
+	Next     string `json:"next"`
+	Previous any    `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"results"`
+}
+
 type cliCommand struct {
     name        string
     description string
-    callback    func() error
+    callback    func(*Config) error
 }
 
 func cleanInput(text string) []string {
@@ -32,6 +42,11 @@ func getCommands() map[string]cliCommand {
             description: "Displays a help message",
             callback: commandHelp,
         },
+        "map": {
+            name: "map",
+            description: "Displays the names of 20 location areas in the Pokemon world",
+            callback: commandMap,
+        },
     }
 }
 
@@ -49,7 +64,7 @@ func startRepl() {
         commandName := words[0]
         command, exists := getCommands()[commandName]
         if exists {
-            err := command.callback()
+            err := command.callback(&Config{})
             if err != nil {
                 fmt.Println(err)
             }
