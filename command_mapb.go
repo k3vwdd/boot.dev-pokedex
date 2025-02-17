@@ -9,12 +9,12 @@ import (
 
 )
 
-func commandMap(c *Config) error {
+func commandMapB(c *Config) error {
     var url string
-    if c.Next == "" {
+    if c.Previous == "" {
         url = "https://pokeapi.co/api/v2/location-area"
     } else {
-        url = c.Next
+        url = c.Previous
     }
     req, err := http.NewRequest("GET", url, nil)
     if err != nil {
@@ -64,5 +64,6 @@ func commandMap(c *Config) error {
     return nil
 
 }
+
 
 
