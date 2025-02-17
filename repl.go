@@ -1,26 +1,23 @@
 package main
 
 import (
-    "fmt"
-    "strings"
-    "os"
-    "bufio"
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+	"github.com/k3vwdd/boot.dev-pokedex/internal/pokeapi"
 )
 
-type Config struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous string    `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
+type config struct {
+    pokeapiClient       pokeapi.Client
+    nextLocationsURL     *string
+    previousLocationsURL *string
 }
 
 type cliCommand struct {
     name        string
     description string
-    callback    func(*Config) error
+    callback    func(*config) error
 }
 
 func cleanInput(text string) []string {
@@ -45,7 +42,7 @@ func getCommands() map[string]cliCommand {
         "map": {
             name: "map",
             description: "Displays the names of the next 20 location areas in the Pokemon world",
-            callback: commandMap,
+            callback: commandMapF,
         },
         "mapb": {
             name: "mapb",
@@ -55,8 +52,7 @@ func getCommands() map[string]cliCommand {
     }
 }
 
-func startRepl() {
-    cfg := &Config{} // global config to update for pagination
+func startRepl(cfg *config) {
     fmt.Print("Pokedex > ")
     userInput := bufio.NewScanner(os.Stdin)
     for userInput.Scan() {
