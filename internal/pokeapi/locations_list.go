@@ -1,20 +1,30 @@
 package pokeapi
 
 import (
-    "encoding/json"
-    "io"
-    "net/http"
-    "boot.dev-pokedex/internal/pokecache"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 )
 
-// list locations
 
 func (c* Client) ListLocations(pageUrl *string) (RespShallowLocations, error) {
+
     url := baseUrl + "/location-area"
     if pageUrl != nil {
         url = *pageUrl
     }
 
+    cachedData, found := c.cache.Get(url)
+    if found {
+        fmt.Println("Serving from cache")
+        cachedLocations := RespShallowLocations{}
+        err := json.Unmarshal(cachedData, &cachedLocations)
+        if err != nil {
+            return RespShallowLocations{}, err
+        }
+        return cachedLocations, nil
+    }
 
     req, err := http.NewRequest("GET", url, nil)
     if err != nil {
@@ -38,6 +48,7 @@ func (c* Client) ListLocations(pageUrl *string) (RespShallowLocations, error) {
     if err != nil {
         return RespShallowLocations{}, err
     }
+    c.cache.Add(url, data)
 
     return locationsResponse, nil
 }

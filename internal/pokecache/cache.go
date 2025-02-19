@@ -37,12 +37,12 @@ func (c *Cache) reapLoop(interval time.Duration) {
 }
 
 func NewCache(interval time.Duration) *Cache {
-    c := &Cache{
+    cache := &Cache{
         cache: make(map[string]cacheEntry),
     }
 
-    go c.reapLoop(interval)
-    return c
+    go cache.reapLoop(interval)
+    return cache
 }
 
 func (c *Cache) Add(key string, val []byte) {
