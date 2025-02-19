@@ -19,19 +19,16 @@ func (c *Cache) reapLoop(interval time.Duration) {
     ticker := time.NewTicker(interval)
     for {
         <- ticker.C
-        var keysToDelete []string
-        c.mutex.Lock()
-        for key, value := range c.cache {
-            elapsedTime := time.Since(value.createdAt)
-            if elapsedTime > interval {
-                keysToDelete = append(keysToDelete, key)
-            }
-        }
-        c.mutex.Unlock()
-        for _, key := range keysToDelete {
-            c.mutex.Lock()
-            delete(c.cache, key)
-            c.mutex.Unlock()
+        c.reap(time.Now(), interval)
+    }
+}
+
+func (c *Cache) reap(time time.Time, last time.Duration) {
+    c.mutex.Lock()
+    defer c.mutex.Unlock()
+    for k, val := range c.cache {
+        if val.createdAt.Before(time.Add(-last)) {
+            delete(c.cache, k)
         }
     }
 }
