@@ -73,7 +73,7 @@ func startRepl(cfg *config) {
         commandName := words[0]
         command, exists := getCommands()[commandName]
         if exists {
-            err := command.callback(cfg) // creates a new config on each call, no memory of previous map command, create a global one to update
+            err := command.callback(cfg, words[1:]...) // creates a new config on each call, no memory of previous map command, create a global one to update
             if err != nil {
                 fmt.Println(err)
             }
