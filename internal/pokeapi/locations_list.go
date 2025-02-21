@@ -7,6 +7,49 @@ import (
 	"net/http"
 )
 
+func (c* Client) GetPokemon(pokemonName string) (Pokemon, error) {
+    url := baseUrl + "/pokemon/" + pokemonName
+
+    cachedData, found := c.cache.Get(url)
+    if found {
+        cachedPokemonCaught := Pokemon{}
+        err := json.Unmarshal(cachedData, &cachedPokemonCaught)
+        if err != nil {
+            return Pokemon{}, err
+        }
+        return cachedPokemonCaught, nil
+    }
+
+    req, err := http.NewRequest("GET", url, nil)
+    if err != nil {
+        return Pokemon{}, err
+    }
+
+    resp, err := c.httpClient.Do(req)
+    if err != nil {
+        return Pokemon{}, err
+    }
+
+    defer resp.Body.Close()
+
+    data, err := io.ReadAll(resp.Body)
+    if err != nil {
+        return Pokemon{}, err
+    }
+
+    pokemonResponseData := Pokemon{}
+    err = json.Unmarshal(data, &pokemonResponseData)
+    if err != nil {
+        return Pokemon{}, err
+    }
+
+    c.cache.Add(url, data)
+
+    return pokemonResponseData, nil
+
+}
+
+
 func (c* Client) ExploreLocationArea(locationName string) (RespPokemonFromALocationArea, error) {
     url := baseUrl + "/location-area/" + locationName
 

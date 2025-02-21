@@ -54,6 +54,11 @@ func getCommands() map[string]cliCommand {
             description: "Displays the pokemon in a specific 'locatin-area'",
             callback: commandExplore,
         },
+        "catch": {
+            name: "catch",
+            description: "Attempt to catch a pokemon based off score",
+            callback: commandCatch,
+        },
 
     }
 }
